@@ -1,0 +1,32 @@
+--задание 1
+CREATE OR REPLACE FUNCTION select_orders_by_item_name(name_position varchar)
+RETURNS TABLE (order_id int,customer varchar,items_count int) 
+AS $$
+SELECT   orders.row_id, customers.name, count( order_id) 
+from orders,customers,orderitems
+where  orderitems.name = name_position 
+and orderitems.order_id = Orders.row_id 
+and customers.row_id =orders.customer_id
+group by orders.row_id,customers.name
+
+$$ 	LANGUAGE SQL
+
+select * from select_orders_by_item_name('Кассовый аппарат')
+
+	
+	
+	--Задание 3
+	
+	
+	SELECT customers.Name 
+	FROM customers
+	WHERE customers.row_id NOT IN (
+	SELECT customers.row_id
+	FROM customers 
+	JOIN orders JOIN orderitems  ON orders.row_id = orderitems.order_id ON customers.row_id = orders.customer_id
+	WHERE orderitems.order_id NOT IN (
+		SELECT orderitems.order_id
+		FROM orderitems
+		WHERE orderitems.name = 'Кассовый аппарат'
+	) AND extract (year from Orders.registered_at) = 2020
+)
